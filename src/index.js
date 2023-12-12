@@ -12,15 +12,55 @@
 // reportWebVitals();
 
 
-// index.js
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
-import userReducer from './reducers/userReducer';
-import App from './App';
+//
+// import React from 'react';
+// import ReactDOM from 'react-dom/client';
+// import { Provider } from 'react-redux';
+// import { createStore } from 'redux';
+// import userReducer from './reducers/userReducer';
+// import helpDeskReducer from './reducers/helpDeskReducer';
+// import App from './App';
 
-const store = createStore(userReducer);
+// const store = createStore(userReducer);
+
+// const root = ReactDOM.createRoot(document.getElementById('root'));
+// root.render(
+//   <Provider store={store}>
+//     <App />
+//   </Provider>,
+// );
+
+// index.js
+// import React from 'react';
+// import ReactDOM from 'react-dom/client';
+// import { Provider } from 'react-redux';
+// import { createStore, combineReducers } from 'redux';
+// import userReducer from './reducers/userReducer';
+// import helpDeskReducer from './reducers/helpDeskReducer';
+// import App from './App';
+
+// // Combine reducers
+// const rootReducer = combineReducers({
+//   user: userReducer,
+//   helpDesk: helpDeskReducer,
+// });
+
+// // Create Redux store
+// const store = createStore(rootReducer);
+
+// // Render the app with the Redux store
+// const root = ReactDOM.createRoot(document.getElementById('root'));
+// root.render(
+//   <Provider store={store}>
+//     <App />
+//   </Provider>,
+// );
+
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import store from './store/index';
+import App from './App';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

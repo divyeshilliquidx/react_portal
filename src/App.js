@@ -7,16 +7,22 @@ import Sidebar from './components/Sidebar';
 import Login from './components/Login';
 import MainContent from './components/MainContent';
 
+import './components/assets/libs/flatpickr/flatpickr.min.css';
+import './components/assets/css/bootstrap.min.css';
+import './components/assets/css/icons.min.css';
+import './components/assets/css/app.min.css';
+
+
+
 const App = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
-
+  console.log(user)
   return (
-    // <BrowserRouter>
-    <div>
-      <Header />
+    <BrowserRouter>
       {user ? (
-        <div>
+        <div id="wrapper">
+          <Header />
           <Sidebar />
           <Routes>
             <Route path="/dashboard/*" element={<MainContent />} />
@@ -29,8 +35,7 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
       </Routes>
-    </div>
-    // </BrowserRouter>
+    </BrowserRouter>
   );
 };
 
