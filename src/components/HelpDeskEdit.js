@@ -100,10 +100,10 @@ const HelpDeskEdit = () => {
     };
 
     const picklists = {
-        priority: ['Select an Option', 'Low', 'Normal', 'High', 'Urgent'],
-        ticket_status: ['Select an Option', 'Open', 'In Progress', 'Wait For Response', 'Closed'],
-        severity: ['Select an Option', 'Minor', 'Major', 'Feature', 'Critical'],
-        category: ['Select an Option', 'Big Problem', 'Small Problem', 'Other Problem'],
+        priority: ['Low', 'Normal', 'High', 'Urgent'],
+        ticket_status: ['Open', 'In Progress', 'Wait For Response', 'Closed'],
+        severity: ['Minor', 'Major', 'Feature', 'Critical'],
+        category: ['Big Problem', 'Small Problem', 'Other Problem'],
         assigned_to: {
             users: [
                 { value: '1', text: 'Divyesh Administrator' },
@@ -176,6 +176,7 @@ const HelpDeskEdit = () => {
                                                         onChange={handleInputChange}
                                                         required
                                                     >
+                                                        <option value="">Select an Option</option>
                                                         {picklists.priority.map((option) => (
                                                             <option key={option} value={option} selected={ticket.priority === option}>
                                                                 {option}
@@ -195,8 +196,8 @@ const HelpDeskEdit = () => {
                                                         id="ticket_status"
                                                         value={ticket.status}
                                                         onChange={handleInputChange}
-                                                        required
                                                     >
+                                                        <option value="">Select an Option</option>
                                                         {picklists.ticket_status.map((option) => (
                                                             <option key={option} value={option} selected={ticket.status === option}>
                                                                 {option}
@@ -216,8 +217,8 @@ const HelpDeskEdit = () => {
                                                         id="severity"
                                                         value={ticket.severity}
                                                         onChange={handleInputChange}
-                                                        required
                                                     >
+                                                        <option value="">Select an Option</option>
                                                         {picklists.severity.map((option) => (
                                                             <option key={option} value={option} selected={ticket.severity === option}>
                                                                 {option}
@@ -237,8 +238,8 @@ const HelpDeskEdit = () => {
                                                         id="category"
                                                         value={ticket.category}
                                                         onChange={handleInputChange}
-                                                        required
                                                     >
+                                                        <option value="">Select an Option</option>
                                                         {picklists.category.map((option) => (
                                                             <option key={option} value={option} selected={ticket.category === option}>
                                                                 {option}
