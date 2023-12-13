@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { format12HourTime, USDCurrencyFormat, formatNumber } from '../helper';
 
 const HelpDeskEdit = () => {
     const { id } = useParams();
+    // const history = useHistory();
+    const navigate = useNavigate('');
     const [ticket, setTicket] = useState({
         title: '',
         priority: '',
-        status: '',
+        ticket_status: '',
         severity: '',
         category: '',
         assigned_to: '',
@@ -73,18 +75,21 @@ const HelpDeskEdit = () => {
                     module: "HelpDesk",
                     recordId: "17x" + id,
                     values: {
-                        "ticket": ticket.title,
-                        "ticketstatus": ticket.status,
+                        "ticket_title": ticket.title,
+                        "ticketstatus": ticket.ticket_status,
                         "ticketpriorities": ticket.priority,
                         "ticketseverities": ticket.severity,
                         "ticketcategories": ticket.category,
-                        "assigned_user_id": "19x1"
-                    }
+                        //"assigned_user_id": "19x1"
+                    },
+                    username: "chothani@illiquidx.com",
+                    password: "Admin@123"
                 }),
             });
 
             if (saveResponse.ok) {
                 console.log('Ticket updated successfully');
+                navigate(`/dashboard/helpdesk-detail/${id}`);
                 // Optionally, you can redirect the user or perform additional actions after successful update
             } else {
                 console.error('Error updating ticket');
@@ -172,7 +177,7 @@ const HelpDeskEdit = () => {
                                                         required
                                                     >
                                                         {picklists.priority.map((option) => (
-                                                            <option key={option} value={option}>
+                                                            <option key={option} value={option} selected={ticket.priority === option}>
                                                                 {option}
                                                             </option>
                                                         ))}
@@ -185,15 +190,15 @@ const HelpDeskEdit = () => {
                                                 </label>
                                                 <div className="col-7">
                                                     <select
-                                                        name="status"
+                                                        name="ticket_status"
                                                         className="form-control"
-                                                        id="status"
+                                                        id="ticket_status"
                                                         value={ticket.status}
                                                         onChange={handleInputChange}
                                                         required
                                                     >
                                                         {picklists.ticket_status.map((option) => (
-                                                            <option key={option} value={option}>
+                                                            <option key={option} value={option} selected={ticket.status === option}>
                                                                 {option}
                                                             </option>
                                                         ))}
@@ -214,7 +219,7 @@ const HelpDeskEdit = () => {
                                                         required
                                                     >
                                                         {picklists.severity.map((option) => (
-                                                            <option key={option} value={option}>
+                                                            <option key={option} value={option} selected={ticket.severity === option}>
                                                                 {option}
                                                             </option>
                                                         ))}
@@ -235,7 +240,7 @@ const HelpDeskEdit = () => {
                                                         required
                                                     >
                                                         {picklists.category.map((option) => (
-                                                            <option key={option} value={option}>
+                                                            <option key={option} value={option} selected={ticket.category === option}>
                                                                 {option}
                                                             </option>
                                                         ))}
@@ -257,14 +262,14 @@ const HelpDeskEdit = () => {
                                                     >
                                                         <optgroup label="Users">
                                                             {picklists.assigned_to.users.map((option) => (
-                                                                <option key={option.value} value={option.value}>
+                                                                <option key={option.value} value={option.value} selected={ticket.assigned_to === option.value}>
                                                                     {option.text}
                                                                 </option>
                                                             ))}
                                                         </optgroup>
                                                         <optgroup label="Groups">
                                                             {picklists.assigned_to.groups.map((option) => (
-                                                                <option key={option.value} value={option.value}>
+                                                                <option key={option.value} value={option.value} selected={ticket.assigned_to === option.value}>
                                                                     {option.text}
                                                                 </option>
                                                             ))}
@@ -276,8 +281,7 @@ const HelpDeskEdit = () => {
                                                 <div className="col-8 offset-4">
                                                     <button
                                                         type="submit"
-                                                        className="btn btn-primary waves-effect waves-light"
-                                                        style={{ marginRight: 10 }}
+                                                        className="btn btn-primary waves-effect waves-light" style={{ marginRight: 10 }}
                                                     >
                                                         Save
                                                     </button>

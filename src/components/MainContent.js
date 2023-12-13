@@ -3,6 +3,8 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ContactList from './ContactList';
 import HelpDeskList from './HelpDeskList';
+import HelpDeskDetail from './HelpDeskDetail';
+import HelpDeskEdit from './HelpDeskEdit';
 
 const MainContent = () => {
   return (
@@ -10,6 +12,8 @@ const MainContent = () => {
       <Routes>
         <Route path="contact-list" element={<ContactList />} />
         <Route path="helpdesk-list" element={<HelpDeskList />} />
+        <Route path="helpdesk-detail/:id" element={<HelpDeskDetail />} />
+        <Route path="helpdesk-edit/:id" element={<HelpDeskEdit />} />
         {/* Add more routes as needed */}
       </Routes>
     </div>

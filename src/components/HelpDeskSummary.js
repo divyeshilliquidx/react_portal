@@ -6,7 +6,7 @@ const HelpDeskSummary = ({ ticket }) => {
         <div className="card-box">
             <div className="media mb-3">
                 <div className="media-body">
-                    <h4 className="mt-0 mb-1">{ticket.title}</h4>
+                    <h4 className="mt-0 mb-1">{ticket.ticket_no}</h4>
                 </div>
             </div>
             <h5 className="mb-3 mt-4 text-uppercase bg-light p-2">

@@ -1,5 +1,6 @@
 // ContactList.js
 import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setHelpDeskData } from '../actions/helpDeskActions';
 import Pagination from './Pagination';
@@ -265,7 +266,7 @@ const HelpDeskList = () => {
                       </div>
                       {/* end col*/}
                     </div>
-                    {console.log(helpDeskData)}
+
                     <div className="table-responsive">
                       <table className="table table-centered table-hover mb-0" style={{ tableLayout: "fixed" }}>
                         <thead>
@@ -273,7 +274,7 @@ const HelpDeskList = () => {
                             <th>Title</th>
                             <th>Status</th>
                             <th>Priority</th>
-                            <th style={{ width: 105 }}>Action</th>
+                            <th style={{ width: 130 }}>Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -283,12 +284,15 @@ const HelpDeskList = () => {
                               <td>{ticket.status}</td>
                               <td>{ticket.priority}</td>
                               <td>
-
-                                <a href="#" className="action-icon">
+                                <Link className="action-icon" to={`/dashboard/helpdesk-edit/${ticket.ticketid}`}>
                                   <i className="mdi mdi-square-edit-outline" />
-                                </a>
-                                <a href="#" className="action-icon" onClick={() => handleViewClick(ticket.ticketid)}>
+                                </Link>
+                                <Link className="action-icon" to={`/dashboard/helpdesk-detail/${ticket.ticketid}`}>
                                   <i className="mdi mdi-eye" />
+                                </Link>
+                                {/* <Link className="action-icon" to={`/helpdesk-detail/${ticket.ticketid}`}><i className="mdi mdi-eye" /></Link> */}
+                                <a href="#" className="action-icon" onClick={() => handleViewClick(ticket.ticketid)}>
+                                  <i class="fa fa-list-alt" aria-hidden="true"></i>
                                 </a>
                                 <a href="#" className="action-icon">
                                   <i className="mdi mdi-delete" />
