@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useHistory } from 'react-router-dom';
 import { format12HourTime, USDCurrencyFormat, formatNumber } from '../helper';
 
 const HelpDeskEdit = () => {
@@ -117,6 +117,10 @@ const HelpDeskEdit = () => {
                 { value: '2', text: 'Team Selling' },
             ],
         },
+    };
+
+    const handleCancel = () => {
+        navigate(`/dashboard/helpdesk-list`);
     };
 
     return (
@@ -288,7 +292,7 @@ const HelpDeskEdit = () => {
                                                     </button>
                                                     <button
                                                         type="reset"
-                                                        className="btn btn-secondary waves-effect m-l-5"
+                                                        className="btn btn-secondary waves-effect m-l-5" onClick={handleCancel}
                                                     >
                                                         Cancel
                                                     </button>

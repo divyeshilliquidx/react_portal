@@ -238,22 +238,34 @@ const HelpDeskList = () => {
                 <div className="card">
                   <div className="card-body">
                     <div className="row mb-2">
-                      <div className="col-sm-4">
+                      <div className="col-sm-6">
                         <form className="form-inline">
-                          <div className="form-group mb-2">
-                            <label htmlFor="inputPassword2" className="sr-only">
-                              Search
-                            </label>
+                          <div className="form-group mb-2 col-sm-12">
+                            <select className="form-control col-sm-4" style={{marginRight: 7}}>
+                              <option value="ticket_title">Ticket Name</option>
+                              <option value="ticketstatus">Status</option>
+                              <option value="ticketpriorities">Priority</option>
+                              <option value="ticketseverities">Severity</option>
+                              <option value="ticketcategories">Category</option>
+                            </select>
                             <input
                               type="search"
                               className="form-control"
                               id="inputPassword2"
                               placeholder="Search..."
+                              style={{ marginRight: 5 }}
                             />
+                            <button
+                              type="button"
+                              className="btn btn-success waves-effect waves-light"
+                            >
+                              Click
+                            </button>
                           </div>
                         </form>
                       </div>
-                      <div className="col-sm-8">
+
+                      <div className="col-sm-6">
                         <div className="text-sm-right">
                           <button
                             type="button"
