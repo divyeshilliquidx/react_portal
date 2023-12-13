@@ -198,7 +198,7 @@ const HelpDeskEdit = () => {
                                                         name="ticket_status"
                                                         className="form-control"
                                                         id="ticket_status"
-                                                        value={ticket.status}
+                                                        value={ticket.ticket_status}
                                                         onChange={handleInputChange}
                                                     >
                                                         <option value="">Select an Option</option>
