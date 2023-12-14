@@ -6,7 +6,7 @@ import { setHelpDeskData } from '../actions/helpDeskActions';
 const HelpDeskDetail = () => {
     const { id } = useParams();
     const [ticket, setTicket] = useState(null);
-    console.log(setHelpDeskData)
+    //console.log(setHelpDeskData)
     useEffect(() => {
         const fetchTicketDetails = async () => {
             try {
