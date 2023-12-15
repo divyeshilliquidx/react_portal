@@ -14,7 +14,7 @@ import HelpDeskEdit from './HelpDeskEdit';
 import UserProfile from './UserProfile';
 
 const MainContent = () => {
-  //const CanvasJS = CanvasJSReact_StockChart.CanvasJS;
+  const CanvasJS = CanvasJSReact_StockChart.CanvasJS;
   const CanvasJSStockChart = CanvasJSReact_StockChart.CanvasJSStockChart;
   var CanvasJSChart = CanvasJSReact_Bar.CanvasJSChart;
 
@@ -112,6 +112,48 @@ const MainContent = () => {
     margin: "auto"
   };
   //End
+
+
+  const addSymbols = (e) => {
+    const suffixes = ["", "K", "M", "B"];
+    let order = Math.max(Math.floor(Math.log(Math.abs(e.value)) / Math.log(1000)), 0);
+
+    if (order > suffixes.length - 1) order = suffixes.length - 1;
+
+    const suffix = suffixes[order];
+    return CanvasJS.formatNumber(e.value / Math.pow(1000, order)) + suffix;
+  };
+
+  const options3 = {
+    animationEnabled: true,
+    theme: "light2", // "light1", "light2", "dark1", "dark2"
+    title: {
+      text: "Top Free Android Apps - June 2018"
+    },
+    axisY: {
+      title: "Number of Downloads",
+      labelFormatter: addSymbols,
+      scaleBreaks: {
+        autoCalculate: true
+      }
+    },
+    axisX: {
+      title: "Apps",
+      labelAngle: 0
+    },
+    data: [{
+      type: "column",
+      dataPoints: [
+        { label: "WhatsApp Messenger", y: 68206498 },
+        { label: "Facebook Messenger", y: 55897709 },
+        { label: "SHAREit", y: 7570438 },
+        { label: "UC Browser", y: 17453224 },
+        { label: "MX Player", y: 6389443 },
+        { label: "Hotstar", y: 4815084 },
+        { label: "Truecaller", y: 7631644 }
+      ]
+    }]
+  };
 
   return (
     <>
@@ -363,6 +405,38 @@ const MainContent = () => {
                   </div>
                 </div>
               </div>
+            </div>
+            <div className="row">
+              <div className="col-xl-6">
+                <div className="card">
+                  <div className="card-body">
+                    <div className="card-widgets">
+                      <a href="javascript: void(0);" data-toggle="reload">
+                        <i className="mdi mdi-refresh" />
+                      </a>
+                      <a
+                        data-toggle="collapse"
+                        href="#cardCollpase1"
+                        role="button"
+                        aria-expanded="false"
+                        aria-controls="cardCollpase1"
+                      >
+                        <i className="mdi mdi-minus" />
+                      </a>
+                      <a href="javascript: void(0);" data-toggle="remove">
+                        <i className="mdi mdi-close" />
+                      </a>
+                    </div>
+                    <h4 className="header-title mb-0">Stock Market Chart</h4>
+                    <div id="cardCollpase1" className="collapse pt-3 show">
+                      <div className="text-center">
+                        <CanvasJSChart options={options3} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>

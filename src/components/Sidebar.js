@@ -24,6 +24,11 @@ const Sidebar = () => {
             <div id="sidebar-menu" className="active">
               <ul className="metismenu in" id="side-menu">
                 <li className="menu-title">Menu</li>
+
+                <li>
+                  <Link to="/dashboard"><i className="dripicons-meter" /><span>Dashboard</span></Link>
+                </li>
+
                 {/* Contact Start */}
                 <li className={contactActive ? 'active' : ''}>
                   <a onClick={toggleContactActive}>
