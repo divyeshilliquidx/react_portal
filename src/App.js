@@ -17,7 +17,6 @@ import './components/assets/css/app.min.css';
 const App = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  console.log(user)
   return (
     <BrowserRouter>
       {user ? (

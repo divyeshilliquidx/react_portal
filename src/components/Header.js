@@ -79,14 +79,14 @@ const Header = () => {
       </ul>
       {/* LOGO */}
       <div className="logo-box">
-        <a href="index.html" className="logo text-center">
+        <Link to={`/dashboard/`} className="logo text-center">
           <span className="logo-lg">
             <img src={logolight} alt="" height={18} />
           </span>
           <span className="logo-sm">
             <img src={logosm} alt="" height={24} />
           </span>
-        </a>
+        </Link>
       </div>
     </div>
     // <header>
