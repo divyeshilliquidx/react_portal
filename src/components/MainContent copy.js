@@ -1,19 +1,17 @@
-// MainContent.js
+// Dashboard.js
 import React, { useState, useEffect } from 'react';
 import CanvasJSReact_StockChart from '@canvasjs/react-stockcharts';
 import CanvasJSReact_Bar from '@canvasjs/react-charts';
 
 
 import { Routes, Route } from 'react-router-dom';
-
-
 import ContactList from './ContactList';
 import HelpDeskList from './HelpDeskList';
 import HelpDeskDetail from './HelpDeskDetail';
 import HelpDeskEdit from './HelpDeskEdit';
 import UserProfile from './UserProfile';
 
-const MainContent = () => {
+const Dashboard = () => {
   //const CanvasJS = CanvasJSReact_StockChart.CanvasJS;
   const CanvasJSStockChart = CanvasJSReact_StockChart.CanvasJSStockChart;
   var CanvasJSChart = CanvasJSReact_Bar.CanvasJSChart;
@@ -115,15 +113,6 @@ const MainContent = () => {
 
   return (
     <>
-      <Routes>
-        <Route path="contact-list" element={<ContactList />} />
-        <Route path="helpdesk-list" element={<HelpDeskList />} />
-        <Route path="helpdesk-detail/:id" element={<HelpDeskDetail />} />
-        <Route path="helpdesk-edit/:id" element={<HelpDeskEdit />} />
-        <Route path="user-profile/:id" element={<UserProfile />} />
-        {/* Add more routes as needed */}
-      </Routes>
-
       <div className="content-page">
         <div className="content">
           {/* Start Content*/}
@@ -299,9 +288,7 @@ const MainContent = () => {
                     </div>
                   </div>
                 </div>
-                {/* end card-box*/}
               </div>
-              {/* end col */}
             </div>
 
             <div className="row">
@@ -373,4 +360,4 @@ const MainContent = () => {
   );
 };
 
-export default MainContent;
+export default Dashboard;
