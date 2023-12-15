@@ -71,10 +71,7 @@ const Header = () => {
               <h6 className="text-overflow m-0">Welcome !</h6>
             </div>
             {/* <Link to="/dashboard/contact-list">Contact List</Link> */}
-            <a href="#" className="dropdown-item notify-item">
-              <i className="fe-user" />
-              <span>My Account</span>
-            </a>
+            <Link to={`/dashboard/user-profile/3`} className="dropdown-item notify-item"> <i className="fe-user" /><span>My Account</span></Link>
             <div className="dropdown-divider"></div>
             <Link to="/login" className="dropdown-item notify-item" onClick={handleLogout}><i className="fe-log-out" /><span>Logout</span></Link>
           </div>

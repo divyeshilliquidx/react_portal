@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setHelpDeskData } from '../actions/helpDeskActions';
 import Pagination from './Pagination';
 import HelpDeskSummary from './HelpDeskSummary';
+import ExportData from './ExportData'; // Adjust the path
 
 //import user8 from '../components/assets/images/users/user-8.jpg';
 //import user4 from '../components/assets/images/users/user-4.jpg';
@@ -252,6 +253,14 @@ const HelpDeskList = () => {
     }
   };
 
+  // Headers for CSV file
+  const headers = [
+    { label: 'Title', key: 'title' },
+    { label: 'Status', key: 'status' },
+    { label: 'Priority', key: 'priority' },
+    // Add more headers as needed
+  ];
+
   return (
     <>
       <div className="content-page">
@@ -279,6 +288,7 @@ const HelpDeskList = () => {
             </div>
             {/* end page title */}
             <div className="row">
+
               <div className="col-xl-8">
                 <div className="card">
                   <div className="card-body">
@@ -322,6 +332,9 @@ const HelpDeskList = () => {
                               onClick={handleSearch}
                             >
                               Search
+                            </button>
+                            <button type="button" className="btn btn-success waves-effect waves-light" style={{ marginLeft: 5 }}>
+                              <ExportData data={helpDeskData} headers={headers} filename="Tickets.csv" />
                             </button>
                           </div>
                         </form>

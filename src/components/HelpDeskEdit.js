@@ -4,8 +4,9 @@ import { format12HourTime, USDCurrencyFormat, formatNumber } from '../helper';
 
 const HelpDeskEdit = () => {
     const { id } = useParams();
-    // const history = useHistory();
     const navigate = useNavigate('');
+    // const history = useHistory();
+    
     const [ticket, setTicket] = useState({
         title: '',
         priority: '',
