@@ -11,6 +11,10 @@ import './components/assets/libs/flatpickr/flatpickr.min.css';
 import './components/assets/css/bootstrap.min.css';
 import './components/assets/css/icons.min.css';
 import './components/assets/css/app.min.css';
+import HelpDeskList from './components/HelpDeskList';
+import HelpDeskDetail from './components/HelpDeskDetail';
+import HelpDeskEdit from './components/HelpDeskEdit';
+import UserProfile from './components/UserProfile';
 
 
 
@@ -26,6 +30,10 @@ const App = () => {
           <Sidebar />
           <Routes>
             <Route path="/dashboard/*" element={<MainContent />} />
+            <Route path="dashboard/helpdesk-list" element={<HelpDeskList />} />
+            <Route path="dashboard/helpdesk-detail/:id" element={<HelpDeskDetail />} />
+            <Route path="dashboard/helpdesk-edit/:id" element={<HelpDeskEdit />} />
+            <Route path="dashboard/user-profile/:id" element={<UserProfile />} />
             <Route path="/*" element={<Navigate to="/dashboard" />} />
           </Routes>
         </div>

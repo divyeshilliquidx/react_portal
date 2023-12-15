@@ -26,7 +26,7 @@ const Sidebar = () => {
                 <li className="menu-title">Menu</li>
                 {/* Contact Start */}
                 <li className={contactActive ? 'active' : ''}>
-                  <a href="#" onClick={toggleContactActive}>
+                  <a onClick={toggleContactActive}>
                     <i className="icon-user" />
                     <span> Contact </span>
                     <span className="menu-arrow" />
@@ -40,7 +40,7 @@ const Sidebar = () => {
                 {/* Contact End */}
                 {/* Ticket Start */}
                 <li className={ticketActive ? 'active' : ''}>
-                  <a href="#" onClick={toggleTicketActive}>
+                  <a onClick={toggleTicketActive}>
                     <i className="dripicons-ticket" />
                     <span> Tickets </span>
                     <span className="menu-arrow" />

@@ -115,15 +115,13 @@ const MainContent = () => {
 
   return (
     <>
-      <Routes>
+      {/* <Routes>
         <Route path="contact-list" element={<ContactList />} />
         <Route path="helpdesk-list" element={<HelpDeskList />} />
         <Route path="helpdesk-detail/:id" element={<HelpDeskDetail />} />
         <Route path="helpdesk-edit/:id" element={<HelpDeskEdit />} />
         <Route path="user-profile/:id" element={<UserProfile />} />
-        {/* Add more routes as needed */}
-      </Routes>
-
+      </Routes> */}
       <div className="content-page">
         <div className="content">
           {/* Start Content*/}
