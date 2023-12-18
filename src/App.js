@@ -17,6 +17,7 @@ import HelpDeskEdit from './components/HelpDeskEdit';
 import UserProfile from './components/UserProfile';
 import ChangePassword from './components/ChangePassword';
 import DocumentList from './components/DocumentList';
+import DocumentDetail from './components/DocumentDetail';
 
 
 
@@ -38,6 +39,7 @@ const App = () => {
             <Route path="dashboard/user-profile/:id" element={<UserProfile />} />
             <Route path="dashboard/change-password/:id" element={<ChangePassword />} />
             <Route path="dashboard/document-list" element={<DocumentList />} />
+            <Route path="dashboard/document-detail/:id" element={<DocumentDetail />} />
             <Route path="/*" element={<Navigate to="/dashboard" />} />
           </Routes>
         </div>

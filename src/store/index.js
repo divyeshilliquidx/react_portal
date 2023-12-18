@@ -14,10 +14,12 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import userReducer from '../reducers/userReducer'; // Assuming you already have a userReducer
 import helpDeskReducer from '../reducers/helpDeskReducer';
+import documentReducer from '../reducers/documentReducer';
 
 const rootReducer = combineReducers({
     user: userReducer,
     helpDesk: helpDeskReducer,
+    document: documentReducer
 });
 
 const store = configureStore({

@@ -19,6 +19,6 @@
 // });
 
 export const setDocumentData = (data) => ({
-    type: 'SET_HELP_DESK_DATA',
+    type: 'SET_DOCUMENT_DATA',
     payload: data,
 });

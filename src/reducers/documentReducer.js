@@ -4,7 +4,7 @@
 //     FETCH_HELP_DESK_REQUEST,
 //     FETCH_HELP_DESK_SUCCESS,
 //     FETCH_HELP_DESK_FAILURE,
-// } from '../actions/helpDeskActions';
+// } from '../actions/documentActions';
 
 // const initialState = {
 //     loading: false,
@@ -31,17 +31,17 @@
 // export default documentReducer;
 
 const initialState = {
-    helpDeskData: [],
+    documentData: [],
     currentPage: 1,
     totalPages: 1,
 };
 
 const documentReducer = (state = initialState, action) => {
     switch (action.type) {
-        case 'SET_HELP_DESK_DATA':
+        case 'SET_DOCUMENT_DATA':
             return {
                 ...state,
-                helpDeskData: action.payload.data,
+                documentData: action.payload.data,
                 currentPage: action.payload.currentPage,
                 totalPages: action.payload.totalPages,
             };

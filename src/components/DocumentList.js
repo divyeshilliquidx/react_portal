@@ -2,10 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { setHelpDeskData } from '../actions/helpDeskActions';
+import { setDocumentData } from '../actions/documentActions';
 import Pagination from './Pagination';
 import DocumentSummary from './DocumentSummary';
 import ExportData from './ExportData'; // Adjust the path
+import DownloadLink from 'react-download-link';
 
 //import user8 from '../components/assets/images/users/user-8.jpg';
 //import user4 from '../components/assets/images/users/user-4.jpg';
@@ -20,20 +21,17 @@ const DocumentList = () => {
   const user_id = process.env.REACT_APP_USERID;
   const user_name = process.env.REACT_APP_USERNAME;
   const user_password = process.env.REACT_APP_USERPASSWORD;
+  const crm_url = process.env.REACT_APP_CRMURL;
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [formErrors, setFormErrors] = useState({});
-  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [selectedDocument, setSelectedDocument] = useState(null);
   const navigate = useNavigate('');
   const [formData, setFormData] = useState({
-    ticket_title: '',
-    ticketstatus: '',
-    ticketpriorities: '',
+    document_title: '',
+    filename: '',
+    // documentpriorities: '',
   });
-  
-  // const [helpDeskData, setHelpDeskData] = useState([]); //old code
-  // const [currentPage, setCurrentPage] = useState(1); //old code
-  // const [totalPages, setTotalPages] = useState(1); //old code
 
   const openModal = () => {
     setModalOpen(true);
@@ -42,9 +40,9 @@ const DocumentList = () => {
   const closeModal = () => {
     setModalOpen(false);
     setFormData({
-      ticket_title: '',
-      ticketstatus: '',
-      ticketpriorities: '',
+      document_title: '',
+      filename: '',
+      // documentpriorities: '',
     });
     setFormErrors({});
   };
@@ -64,26 +62,12 @@ const DocumentList = () => {
 
   const validateForm = () => {
     let errors = {};
-    if (!formData.ticket_title.trim()) {
-      errors.ticket_title = 'This field is required';
+    if (!formData.document_title.trim()) {
+      errors.document_title = 'This field is required';
     }
-    if (!formData.ticketstatus.trim()) {
-      errors.ticketstatus = 'This field is required';
+    if (!formData.filename.trim()) {
+      errors.filename = 'This field is required';
     }
-    if (!formData.ticketpriorities.trim()) {
-      errors.ticketpriorities = 'This field is required';
-    }
-    // if (!formData.email.trim()) {
-    //   errors.email = 'Email is required';
-    // } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-    //   errors.email = 'Invalid email format';
-    // }
-    // if (!formData.phone.trim()) {
-    //   errors.phone = 'Phone is required';
-    // }
-    // if (!formData.location.trim()) {
-    //   errors.location = 'Location is required';
-    // }
     return errors;
   };
 
@@ -91,41 +75,52 @@ const DocumentList = () => {
     e.preventDefault();
     const errors = validateForm();
     if (Object.keys(errors).length === 0) {
-      // Form is valid, perform save logic here
-      // console.log('Form data:', formData);
-      // closeModal();
-
       try {
-        // Example of save API endpoint (replace with your actual API)
+
+        const formData = new FormData();
+        formData.append('module', 'Documents');
+        formData.append('values[notes_title]', formData.document_title);
+        formData.append('file', document.getElementById('filename').files[0]);
+        formData.append('username', user_name);
+        formData.append('password', user_password);
+
         const saveResponse = await fetch('http://localhost:3000/saveRecord', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            module: "HelpDesk",
-            values: {
-              "ticket_title": formData.ticket_title,
-              "ticketstatus": formData.ticketstatus,
-              "ticketpriorities": formData.ticketpriorities,
-              //"assigned_user_id": "19x1"
-            },
-            username: user_name,
-            password: user_password
-          }),
+          body: JSON.stringify(formData),
         });
+
+        // Example of save API endpoint (replace with your actual API)
+        // const saveResponse = await fetch('http://localhost:3000/saveRecord', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify({
+        //     module: "Documents",
+        //     values: {
+        //       "notes_title": formData.document_title,
+        //     },
+        //     filename: formData.document_title,
+        //     file: formData.filename,
+        //     username: user_name,
+        //     password: user_password
+        //   }),
+        // });
 
         if (saveResponse.ok) {
           const saveData = await saveResponse.json();
-          var ticketIdString = saveData.result.record.id;
-          var ticketId = ticketIdString.split('x')[1];
-          navigate(`/dashboard/helpdesk-detail/${ticketId}`);
+          var documentIdString = saveData.result.record.id;
+          var documentId = documentIdString.split('x')[1];
+          navigate(`/dashboard/document-detail/${documentId}`);
           // Optionally, you can redirect the user or perform additional actions after successful update
         } else {
-          console.error('Error updating ticket');
+          console.error('Error updating document');
         }
       } catch (error) {
-        console.error('Error updating ticket', error);
+        console.error('Error updating document', error);
       }
     } else {
       setFormErrors(errors);
@@ -134,42 +129,11 @@ const DocumentList = () => {
 
   //new code start
   const dispatch = useDispatch();
-  const helpDeskState = useSelector((state) => state.helpDesk);
-  const { helpDeskData, currentPage, totalPages } = helpDeskState;
+  const documentState = useSelector((state) => state.document);
+  const { documentData, currentPage, totalPages } = documentState;
   //new end
 
-  //Old code  start
-  // const fetchHelpDeskData = async (page = 1) => {
-  //   try {
-  //     const response = await fetch(`http://localhost:3000/fetchReferenceRecords`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         module: 'HelpDesk',
-  //         page,
-  //         search_params: [[]],
-  //         crmid: 0,
-  //         contactid: 3,
-  //       }),
-  //     });
-
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       setHelpDeskData(data.result);
-  //       setCurrentPage(page);
-  //       setTotalPages(64);
-  //     } else {
-  //       console.error('Error fetching help desk data');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching help desk data', error);
-  //   }
-  // };
-  //Old Code end
-
-  const fetchHelpDeskData = async (searchtype, page = 1) => {
+  const fetchDocumentData = async (searchtype, page = 1) => {
     try {
 
       const searchField = document.getElementById('search_fieldname');
@@ -182,7 +146,7 @@ const DocumentList = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          module: 'HelpDesk',
+          module: 'Documents',
           page,
           search_params: [[[selectedOption.value, searchtype, searchValue]]],
           crmid: 0,
@@ -195,7 +159,7 @@ const DocumentList = () => {
 
         // Dispatch the action to update the Redux state
         dispatch(
-          setHelpDeskData({
+          setDocumentData({
             data: data.result,
             currentPage: page,
             totalPages: 5, // Assuming totalPages is fixed in your case
@@ -203,7 +167,7 @@ const DocumentList = () => {
         );
       }
       // Perform your API fetch here...
-      //const response = await fetch(`http://localhost:3000/fetchHelpDeskData?page=${page}`);
+      //const response = await fetch(`http://localhost:3000/fetchDocumentData?page=${page}`);
     } catch (error) {
       console.error('Error fetching help desk data', error);
     }
@@ -214,11 +178,11 @@ const DocumentList = () => {
     const selectedOption = searchField.options[searchField.selectedIndex];
     const searchtype = selectedOption.getAttribute('data-searchtype');
 
-    fetchHelpDeskData(searchtype, 1);
+    fetchDocumentData(searchtype, 1);
   };
 
   useEffect(() => {
-    fetchHelpDeskData();
+    fetchDocumentData();
   }, []); // Fetch data on component mount
 
   const handlePageChange = (newPage) => {
@@ -226,13 +190,10 @@ const DocumentList = () => {
     const selectedOption = searchField.options[searchField.selectedIndex];
     const searchtype = selectedOption.getAttribute('data-searchtype');
 
-    fetchHelpDeskData(searchtype, newPage);
+    fetchDocumentData(searchtype, newPage);
   };
 
-
-  
-
-  const handleViewClick = async (ticketid) => {
+  const handleViewClick = async (notesid) => {
     try {
       const response = await fetch(`http://localhost:3000/fetchReferenceRecords`, {
         method: 'POST',
@@ -240,22 +201,22 @@ const DocumentList = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          module: 'HelpDesk',
+          module: 'Documents',
           page: 1,
           search_params: [[]],
-          crmid: ticketid,
+          crmid: notesid,
           contactid: user_id,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setSelectedTicket(data.result[0]);
+        setSelectedDocument(data.result[0]);
       } else {
-        console.error('Error fetching ticket details');
+        console.error('Error fetching document details');
       }
     } catch (error) {
-      console.error('Error fetching ticket details', error);
+      console.error('Error fetching document details', error);
     }
   };
 
@@ -285,10 +246,10 @@ const DocumentList = () => {
                       <li className="breadcrumb-item">
                         <a href="#">CRM</a>
                       </li>
-                      <li className="breadcrumb-item active">Tickets</li>
+                      <li className="breadcrumb-item active">Documents</li>
                     </ol>
                   </div>
-                  <h4 className="page-title">Tickets</h4>
+                  <h4 className="page-title">Documents</h4>
                 </div>
               </div>
             </div>
@@ -308,20 +269,8 @@ const DocumentList = () => {
                               className="form-control col-sm-4"
                               style={{ marginRight: 7 }}
                             >
-                              <option value="ticket_title" data-searchtype="like">
-                                Ticket Name
-                              </option>
-                              <option value="ticketstatus" data-searchtype="equel">
-                                Status
-                              </option>
-                              <option value="ticketpriorities" data-searchtype="equel">
-                                Priority
-                              </option>
-                              <option value="ticketseverities" data-searchtype="equel">
-                                Severity
-                              </option>
-                              <option value="ticketcategories" data-searchtype="equel">
-                                Category
+                              <option value="notes_title" data-searchtype="like">
+                                Document Name
                               </option>
                             </select>
                             <input
@@ -341,7 +290,7 @@ const DocumentList = () => {
                               Search
                             </button>
                             <button type="button" className="btn btn-success waves-effect waves-light" style={{ marginLeft: 5 }}>
-                              <ExportData data={helpDeskData} headers={headers} filename="Tickets.csv" />
+                              <ExportData data={documentData} headers={headers} filename="Documents.csv" />
                             </button>
                           </div>
                         </form>
@@ -354,7 +303,7 @@ const DocumentList = () => {
                             className="btn btn-danger waves-effect waves-light mb-2"
                             onClick={openModal}
                           >
-                            <i className="mdi mdi-plus-circle mr-1" /> Add Ticket
+                            <i className="mdi mdi-plus-circle mr-1" /> Add Document
                           </button>
                         </div>
                       </div>
@@ -366,26 +315,24 @@ const DocumentList = () => {
                         <thead>
                           <tr>
                             <th>Title</th>
-                            <th>Status</th>
-                            <th>Priority</th>
+                            <th>Filename</th>
                             <th style={{ width: 130 }}>Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {helpDeskData.map((ticket) => (
-                            <tr key={ticket.ticketid}>
-                              <td>{ticket.title}</td>
-                              <td>{ticket.status}</td>
-                              <td>{ticket.priority}</td>
+                          {documentData.map((document) => (
+                            <tr key={document.notesid}>
+                              <td>{document.title}</td>
+                              <td><Link to={`${crm_url}/${document.path}${document.attachmentsid}_${document.storedname}`} target="_blank" download>{document.filename}</Link></td>
                               <td>
-                                <Link className="action-icon" to={`/dashboard/helpdesk-edit/${ticket.ticketid}`}>
+                                <Link className="action-icon" to={`/dashboard/document-edit/${document.notesid}`}>
                                   <i className="mdi mdi-square-edit-outline" />
                                 </Link>
-                                <Link className="action-icon" to={`/dashboard/helpdesk-detail/${ticket.ticketid}`}>
+                                <Link className="action-icon" to={`/dashboard/document-detail/${document.notesid}`}>
                                   <i className="mdi mdi-eye" />
                                 </Link>
-                                {/* <Link className="action-icon" to={`/helpdesk-detail/${ticket.ticketid}`}><i className="mdi mdi-eye" /></Link> */}
-                                <a href="#" className="action-icon" onClick={() => handleViewClick(ticket.ticketid)}>
+                                {/* <Link className="action-icon" to={`/document-detail/${document.notesid}`}><i className="mdi mdi-eye" /></Link> */}
+                                <a href="#" className="action-icon" onClick={() => handleViewClick(document.notesid)}>
                                   <i className="fa fa-list-alt" aria-hidden="true"></i>
                                 </a>
                                 <a href="#" className="action-icon">
@@ -402,15 +349,15 @@ const DocumentList = () => {
                 </div>
               </div>
               <div className="col-xl-4">
-                {selectedTicket ? (
-                  <DocumentSummary ticket={selectedTicket} />
+                {selectedDocument ? (
+                  <DocumentSummary document={selectedDocument} />
                 ) : (
                   <div className="card-box">
-                    {/* Initial content when no ticket is selected */}
+                    {/* Initial content when no document is selected */}
                     <h5 className="mb-3 mt-4 text-uppercase bg-light p-2">
                       <i className="mdi mdi-account-circle mr-1" /> Summary View
                     </h5>
-                    <p>Please select a ticket to view details.</p>
+                    <p>Please select a document to view details.</p>
                   </div>
                 )}
               </div>
@@ -427,85 +374,35 @@ const DocumentList = () => {
               <span>×</span>
               <span className="sr-only">Close</span>
             </button>
-            <h4 className="custom-modal-title">Add Tickets</h4>
+            <h4 className="custom-modal-title">Add Documents</h4>
             <div className="custom-modal-text text-left">
               {/* Your modal content goes here */}
               <form>
                 <div className="form-group">
-                  <label>Ticket Name<span className="text-danger">*</span></label>
+                  <label>Document Name<span className="text-danger">*</span></label>
                   <input
                     type="text"
-                    className={`form-control ${formErrors.ticket_title ? 'is-invalid' : ''}`}
-                    id="ticket_title"
-                    name="ticket_title"
+                    className={`form-control ${formErrors.document_title ? 'is-invalid' : ''}`}
+                    id="document_title"
+                    name="document_title"
                     placeholder="Enter name"
-                    value={formData.ticket_title}
+                    value={formData.document_title}
                     onChange={handleInputChange}
                   />
-                  {formErrors.ticket_title && <div className="invalid-feedback">{formErrors.ticket_title}</div>}
+                  {formErrors.document_title && <div className="invalid-feedback">{formErrors.document_title}</div>}
                 </div>
 
                 <div className="form-group">
-                  <label>Status<span className="text-danger">*</span></label>
-                  <select
-                    name="ticketstatus"
-                    className={`form-control ${formErrors.ticketstatus ? 'is-invalid' : ''}`}
-                    id="ticketstatus"
-                    value={formData.ticketstatus}
-                    onChange={handleInputChange}
-                  >
-                    <option value="">Select an Option</option>
-                    <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Wait For Response">Wait For Response</option>
-                    <option value="Closed">Closed</option>
-                  </select>
-                  {formErrors.ticketstatus && <div className="invalid-feedback">{formErrors.ticketstatus}</div>}
-                </div>
-                <div className="form-group">
-                  <label>Priority<span className="text-danger">*</span></label>
-                  <select
-                    name="ticketpriorities"
-                    className={`form-control ${formErrors.ticketpriorities ? 'is-invalid' : ''}`}
-                    id="ticketpriorities"
-                    value={formData.ticketpriorities}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Select an Option</option>
-                    <option value="Low">Low</option>
-                    <option value="Normal">Normal</option>
-                    <option value="High">High</option>
-                    <option value="Urgent">Urgent</option>
-                  </select>
-                  {formErrors.ticketpriorities && <div className="invalid-feedback">{formErrors.ticketpriorities}</div>}
-                </div>
-                {/* <div className="form-group">
-                  <label htmlFor="position">Phone</label>
+                  <label>File Upload<span className="text-danger">*</span></label>
                   <input
-                    type="text"
-                    className={`form-control ${formErrors.phone ? 'is-invalid' : ''}`}
-                    id="phone"
-                    name="phone"
-                    placeholder="Enter phone number"
-                    value={formData.phone}
+                    type="file"
+                    id="filename"
+                    name="filename"
+                    className={`form-control ${formErrors.filename ? 'is-invalid' : ''}`}
                     onChange={handleInputChange}
                   />
-                  {formErrors.phone && <div className="invalid-feedback">{formErrors.phone}</div>}
-                </div> */}
-                {/* <div className="form-group">
-                  <label htmlFor="company">Location</label>
-                  <input
-                    type="text"
-                    className={`form-control ${formErrors.location ? 'is-invalid' : ''}`}
-                    id="location"
-                    name="location"
-                    placeholder="Enter location"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                  />
-                  {formErrors.location && <div className="invalid-feedback">{formErrors.location}</div>}
-                </div> */}
+                  {formErrors.filename && <div className="invalid-feedback">{formErrors.filename}</div>}
+                </div>
                 <div className="text-right">
                   <button
                     type="submit"

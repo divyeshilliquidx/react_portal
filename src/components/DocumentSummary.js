@@ -1,12 +1,14 @@
 // DocumentSummary.js
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-const DocumentSummary = ({ ticket }) => {
+const DocumentSummary = ({ document }) => {
+    const crm_url = process.env.REACT_APP_CRMURL;
     return (
         <div className="card-box">
             <div className="media mb-3">
                 <div className="media-body">
-                    <h4 className="mt-0 mb-1">{ticket.ticket_no}</h4>
+                    <h4 className="mt-0 mb-1">{document.note_no}</h4>
                 </div>
             </div>
             <h5 className="mb-3 mt-4 text-uppercase bg-light p-2">
@@ -14,19 +16,19 @@ const DocumentSummary = ({ ticket }) => {
             </h5>
             <div className="">
                 <h4 className="font-14 mb-1">
-                    Ticket:
+                    Title:
                 </h4>
-                <p className="mb-3">{ticket.title}</p>
+                <p className="mb-3">{document.title}</p>
 
                 <h4 className="font-14 mb-1">
-                    Status:
+                    File Name:
                 </h4>
-                <p className="mb-3">{ticket.status}</p>
+                <p className="mb-3">{document.filename}</p>
 
                 <h4 className="font-14 mb-1">
-                    Priority:
+                    Download File:
                 </h4>
-                <p className="mb-3">{ticket.priority}</p>
+                <p className="mb-3"><Link to={`${crm_url}/${document.path}${document.attachmentsid}_${document.storedname}`} target="_blank" download>{document.filename}</Link></p>
             </div>
         </div>
     );
