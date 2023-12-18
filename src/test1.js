@@ -5,7 +5,7 @@ import { setHelpDeskData } from '../actions/helpDeskActions';
 import Pagination from './Pagination';
 import HelpDeskSummary from './HelpDeskSummary';
 
-import './ContactList.css';
+import './Common.css';
 import './assets/libs/custombox/custombox.min.css';
 import './assets/css/bootstrap.min.css';
 import './assets/css/icons.min.css';

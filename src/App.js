@@ -15,13 +15,15 @@ import HelpDeskList from './components/HelpDeskList';
 import HelpDeskDetail from './components/HelpDeskDetail';
 import HelpDeskEdit from './components/HelpDeskEdit';
 import UserProfile from './components/UserProfile';
+import ChangePassword from './components/ChangePassword';
+import DocumentList from './components/DocumentList';
 
 
 
 const App = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  console.log(user)
+  
   return (
     <BrowserRouter>
       {user ? (
@@ -34,6 +36,8 @@ const App = () => {
             <Route path="dashboard/helpdesk-detail/:id" element={<HelpDeskDetail />} />
             <Route path="dashboard/helpdesk-edit/:id" element={<HelpDeskEdit />} />
             <Route path="dashboard/user-profile/:id" element={<UserProfile />} />
+            <Route path="dashboard/change-password/:id" element={<ChangePassword />} />
+            <Route path="dashboard/document-list" element={<DocumentList />} />
             <Route path="/*" element={<Navigate to="/dashboard" />} />
           </Routes>
         </div>
