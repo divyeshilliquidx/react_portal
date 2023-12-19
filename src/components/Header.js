@@ -79,7 +79,7 @@ const Header = () => {
             {/* <Link to="/dashboard/contact-list">Contact List</Link> */}
             <Link to={`/dashboard/user-profile/${user_id}`} className="dropdown-item notify-item"> <i className="fe-user" /><span>My Account</span></Link>
             <div className="dropdown-divider"></div>
-            <Link to={`/dashboard/change-password/${user_id}`} className="dropdown-item notify-item"> <i className="fe-user" /><span>Change Password</span></Link>
+            <Link to={`/dashboard/change-password/${user_id}`} className="dropdown-item notify-item"> <i className="mdi mdi-lock-reset" /><span>Change Password</span></Link>
             <div className="dropdown-divider"></div>
             <Link to="/login" className="dropdown-item notify-item" onClick={handleLogout}><i className="fe-log-out" /><span>Logout</span></Link>
           </div>
