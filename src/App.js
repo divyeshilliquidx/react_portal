@@ -25,7 +25,7 @@ import DocumentEdit from './components/DocumentEdit';
 const App = () => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  
+
   return (
     <BrowserRouter>
       {user ? (

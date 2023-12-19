@@ -7,6 +7,7 @@ const DocumentEdit = () => {
     const user_id = process.env.REACT_APP_USERID;
     const user_name = process.env.REACT_APP_USERNAME;
     const user_password = process.env.REACT_APP_USERPASSWORD;
+    const crm_url = process.env.REACT_APP_CRMURL;
 
     const { id } = useParams();
     const navigate = useNavigate('');
@@ -75,7 +76,7 @@ const DocumentEdit = () => {
             postData.append('filename', documentdata.title);
             postData.append('username', user_name);
             postData.append('password', user_password);
-            //postData.append('recordId', '');
+            postData.append('recordId', '15x' + id);
 
             const saveResponse = await fetch('http://localhost:3000/saveRecord', {
                 method: 'POST',
@@ -161,6 +162,7 @@ const DocumentEdit = () => {
                                                         onChange={(e) => handleInputChange(e)}
                                                     />
                                                     {documentdata.storedname && <span>{documentdata.storedname.name}</span>}
+                                                    <a href={`${crm_url}/${documentdata.path}${documentdata.attachmentsid}_${documentdata.storedname}`}>{documentdata.filename}</a>
                                                 </div>
                                             </div>
                                             <div className="form-group row">
