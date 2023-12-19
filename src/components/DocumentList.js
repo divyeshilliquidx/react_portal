@@ -29,8 +29,7 @@ const DocumentList = () => {
   const navigate = useNavigate('');
   const [formData, setFormData] = useState({
     document_title: '',
-    filename: '',
-    // documentpriorities: '',
+    document_uploadfile: '',
   });
 
   const openModal = () => {
@@ -41,8 +40,7 @@ const DocumentList = () => {
     setModalOpen(false);
     setFormData({
       document_title: '',
-      filename: '',
-      // documentpriorities: '',
+      document_uploadfile: '',
     });
     setFormErrors({});
   };
@@ -65,8 +63,8 @@ const DocumentList = () => {
     if (!formData.document_title.trim()) {
       errors.document_title = 'This field is required';
     }
-    if (!formData.filename.trim()) {
-      errors.filename = 'This field is required';
+    if (!formData.document_uploadfile) {
+      errors.document_uploadfile = 'Please select a file';
     }
     return errors;
   };
@@ -76,46 +74,25 @@ const DocumentList = () => {
     const errors = validateForm();
     if (Object.keys(errors).length === 0) {
       try {
-
-        const formData = new FormData();
-        formData.append('module', 'Documents');
-        formData.append('values[notes_title]', formData.document_title);
-        formData.append('file', document.getElementById('filename').files[0]);
-        formData.append('username', user_name);
-        formData.append('password', user_password);
+        const postData = new FormData();
+        postData.append('module', 'Documents');
+        postData.append('values', JSON.stringify({ notes_title: formData.document_title }));
+        postData.append('filename', formData.document_title);
+        postData.append('file', document.getElementById('document_uploadfile').files[0]);
+        postData.append('username', user_name);
+        postData.append('password', user_password);
+        //postData.append('recordId', '');
 
         const saveResponse = await fetch('http://localhost:3000/saveRecord', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
+          body: postData,
         });
-
-        // Example of save API endpoint (replace with your actual API)
-        // const saveResponse = await fetch('http://localhost:3000/saveRecord', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({
-        //     module: "Documents",
-        //     values: {
-        //       "notes_title": formData.document_title,
-        //     },
-        //     filename: formData.document_title,
-        //     file: formData.filename,
-        //     username: user_name,
-        //     password: user_password
-        //   }),
-        // });
 
         if (saveResponse.ok) {
           const saveData = await saveResponse.json();
           var documentIdString = saveData.result.record.id;
           var documentId = documentIdString.split('x')[1];
           navigate(`/dashboard/document-detail/${documentId}`);
-          // Optionally, you can redirect the user or perform additional actions after successful update
         } else {
           console.error('Error updating document');
         }
@@ -222,10 +199,7 @@ const DocumentList = () => {
 
   // Headers for CSV file
   const headers = [
-    { label: 'Title', key: 'title' },
-    { label: 'Status', key: 'status' },
-    { label: 'Priority', key: 'priority' },
-    // Add more headers as needed
+    { label: 'Title', key: 'title' }
   ];
 
   return (
@@ -323,7 +297,7 @@ const DocumentList = () => {
                           {documentData.map((document) => (
                             <tr key={document.notesid}>
                               <td>{document.title}</td>
-                              <td><Link to={`${crm_url}/${document.path}${document.attachmentsid}_${document.storedname}`} target="_blank" download>{document.filename}</Link></td>
+                              <td><Link to={`${crm_url}/${document.path}${document.attachmentsid}_${document.storedname}`} target="_blank" download rel="noreferrer">{document.filename}</Link></td>
                               <td>
                                 <Link className="action-icon" to={`/dashboard/document-edit/${document.notesid}`}>
                                   <i className="mdi mdi-square-edit-outline" />
@@ -396,29 +370,16 @@ const DocumentList = () => {
                   <label>File Upload<span className="text-danger">*</span></label>
                   <input
                     type="file"
-                    id="filename"
-                    name="filename"
-                    className={`form-control ${formErrors.filename ? 'is-invalid' : ''}`}
+                    id="document_uploadfile"
+                    name="document_uploadfile"
+                    className={`form-control ${formErrors.document_uploadfile ? 'is-invalid' : ''}`}
                     onChange={handleInputChange}
                   />
-                  {formErrors.filename && <div className="invalid-feedback">{formErrors.filename}</div>}
+                  {formErrors.document_uploadfile && <div className="invalid-feedback">{formErrors.document_uploadfile}</div>}
                 </div>
                 <div className="text-right">
-                  <button
-                    type="submit"
-                    className="btn btn-success waves-effect waves-light"
-                    style={{ marginRight: 5 }}
-                    onClick={handleSave}
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger waves-effect waves-light m-l-10"
-                    onClick={closeModal}
-                  >
-                    Cancel
-                  </button>
+                  <button type="submit" className="btn btn-success waves-effect waves-light" style={{ marginRight: 5 }} onClick={handleSave}>Save</button>
+                  <button type="button" className="btn btn-danger waves-effect waves-light m-l-10" onClick={closeModal}>Cancel</button>
                 </div>
               </form>
             </div>

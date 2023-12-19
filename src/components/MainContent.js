@@ -180,7 +180,7 @@ const MainContent = () => {
                       <li className="breadcrumb-item active">Dashboard</li>
                     </ol>
                   </div>
-                  <h4 className="page-title">Dashboard 2</h4>
+                  <h4 className="page-title">Dashboard</h4>
                 </div>
               </div>
             </div>

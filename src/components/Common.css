@@ -21,3 +21,11 @@
   max-width: 100%;
   /* max-height: 95%; */
 }
+
+div.blockData table.table td {
+  border: none;
+}
+
+body {
+  color: black
+}

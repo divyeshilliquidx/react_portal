@@ -30,7 +30,7 @@ const HelpDeskList = () => {
     ticketstatus: '',
     ticketpriorities: '',
   });
-  
+
   // const [helpDeskData, setHelpDeskData] = useState([]); //old code
   // const [currentPage, setCurrentPage] = useState(1); //old code
   // const [totalPages, setTotalPages] = useState(1); //old code
@@ -96,23 +96,18 @@ const HelpDeskList = () => {
       // closeModal();
 
       try {
+
+        const postData = new FormData();
+        postData.append('module', 'HelpDesk');
+        postData.append('values', JSON.stringify({ "ticket_title": formData.ticket_title, "ticketstatus": formData.ticketstatus, "ticketpriorities": formData.ticketpriorities }));
+        postData.append('username', user_name);
+        postData.append('password', user_password);
+        postData.append('recordId', '');
+
         // Example of save API endpoint (replace with your actual API)
         const saveResponse = await fetch('http://localhost:3000/saveRecord', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            module: "HelpDesk",
-            values: {
-              "ticket_title": formData.ticket_title,
-              "ticketstatus": formData.ticketstatus,
-              "ticketpriorities": formData.ticketpriorities,
-              //"assigned_user_id": "19x1"
-            },
-            username: user_name,
-            password: user_password
-          }),
+          body: postData,
         });
 
         if (saveResponse.ok) {
@@ -230,7 +225,7 @@ const HelpDeskList = () => {
   };
 
 
-  
+
 
   const handleViewClick = async (ticketid) => {
     try {
