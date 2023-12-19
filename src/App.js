@@ -18,6 +18,7 @@ import UserProfile from './components/UserProfile';
 import ChangePassword from './components/ChangePassword';
 import DocumentList from './components/DocumentList';
 import DocumentDetail from './components/DocumentDetail';
+import DocumentEdit from './components/DocumentEdit';
 
 
 
@@ -40,6 +41,7 @@ const App = () => {
             <Route path="dashboard/change-password/:id" element={<ChangePassword />} />
             <Route path="dashboard/document-list" element={<DocumentList />} />
             <Route path="dashboard/document-detail/:id" element={<DocumentDetail />} />
+            <Route path="dashboard/document-edit/:id" element={<DocumentEdit />} />
             <Route path="/*" element={<Navigate to="/dashboard" />} />
           </Routes>
         </div>
