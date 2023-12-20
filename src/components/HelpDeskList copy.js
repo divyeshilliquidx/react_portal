@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setHelpDeskData } from '../actions/helpDeskActions';
 import Pagination from './Pagination';
 import HelpDeskSummary from './HelpDeskSummary';
+import ExportData from './ExportData'; // Adjust the path
 
 //import user8 from '../components/assets/images/users/user-8.jpg';
 //import user4 from '../components/assets/images/users/user-4.jpg';
@@ -13,18 +14,26 @@ import './assets/libs/custombox/custombox.min.css';
 import './assets/css/bootstrap.min.css';
 import './assets/css/icons.min.css';
 import './assets/css/app.min.css';
+import ProductPopupList from './ProductPopupList';
 
 const HelpDeskList = () => {
 
+  const user_id = process.env.REACT_APP_USERID;
+  const user_name = process.env.REACT_APP_USERNAME;
+  const user_password = process.env.REACT_APP_USERPASSWORD;
+
+  const navigate = useNavigate('');
+
   const [isModalOpen, setModalOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const [selectedTicket, setSelectedTicket] = useState(null);
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    location: '',
+    ticket_title: '',
+    ticketstatus: '',
+    ticketpriorities: '',
   });
-  const [formErrors, setFormErrors] = useState({});
+
   // const [helpDeskData, setHelpDeskData] = useState([]); //old code
   // const [currentPage, setCurrentPage] = useState(1); //old code
   // const [totalPages, setTotalPages] = useState(1); //old code
@@ -36,12 +45,15 @@ const HelpDeskList = () => {
   const closeModal = () => {
     setModalOpen(false);
     setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      location: '',
+      ticket_title: '',
+      ticketstatus: '',
+      ticketpriorities: '',
     });
     setFormErrors({});
+    setSelectedProduct({
+      productid: '',
+      productname: '',
+    });
   };
 
   const handleInputChange = (e) => {
@@ -59,30 +71,64 @@ const HelpDeskList = () => {
 
   const validateForm = () => {
     let errors = {};
-    if (!formData.name.trim()) {
-      errors.name = 'Name is required';
+    if (!formData.ticket_title.trim()) {
+      errors.ticket_title = 'This field is required';
     }
-    if (!formData.email.trim()) {
-      errors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Invalid email format';
+    if (!formData.ticketstatus.trim()) {
+      errors.ticketstatus = 'This field is required';
     }
-    if (!formData.phone.trim()) {
-      errors.phone = 'Phone is required';
+    if (!formData.ticketpriorities.trim()) {
+      errors.ticketpriorities = 'This field is required';
     }
-    if (!formData.location.trim()) {
-      errors.location = 'Location is required';
-    }
+    // if (!formData.email.trim()) {
+    //   errors.email = 'Email is required';
+    // } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    //   errors.email = 'Invalid email format';
+    // }
+    // if (!formData.phone.trim()) {
+    //   errors.phone = 'Phone is required';
+    // }
+    // if (!formData.location.trim()) {
+    //   errors.location = 'Location is required';
+    // }
     return errors;
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     const errors = validateForm();
     if (Object.keys(errors).length === 0) {
       // Form is valid, perform save logic here
-      console.log('Form data:', formData);
-      closeModal();
+      // console.log('Form data:', formData);
+      // closeModal();
+
+      try {
+
+        const postData = new FormData();
+        postData.append('module', 'HelpDesk');
+        postData.append('values', JSON.stringify({ "ticket_title": formData.ticket_title, "ticketstatus": formData.ticketstatus, "ticketpriorities": formData.ticketpriorities }));
+        postData.append('username', user_name);
+        postData.append('password', user_password);
+        postData.append('recordId', '');
+
+        // Example of save API endpoint (replace with your actual API)
+        const saveResponse = await fetch('http://localhost:3000/saveRecord', {
+          method: 'POST',
+          body: postData,
+        });
+
+        if (saveResponse.ok) {
+          const saveData = await saveResponse.json();
+          var ticketIdString = saveData.result.record.id;
+          var ticketId = ticketIdString.split('x')[1];
+          navigate(`/dashboard/helpdesk-detail/${ticketId}`);
+          // Optionally, you can redirect the user or perform additional actions after successful update
+        } else {
+          console.error('Error updating ticket');
+        }
+      } catch (error) {
+        console.error('Error updating ticket', error);
+      }
     } else {
       setFormErrors(errors);
     }
@@ -125,8 +171,21 @@ const HelpDeskList = () => {
   // };
   //Old Code end
 
-  const fetchHelpDeskData = async (page = 1) => {
+  const fetchHelpDeskData = async (searchtype, page = 1) => {
     try {
+
+      const searchField = document.getElementById('search_fieldname');
+      const selectedOption = searchField.options[searchField.selectedIndex];
+      const searchValue = document.getElementById('search_value').value;
+
+      let searchParams;
+      if (searchValue.trim() === '') {
+        // If searchValue is blank, set searchParams to an empty array
+        searchParams = [[]];
+      } else {
+        // If searchValue is not blank, set searchParams with the specified value
+        searchParams = [[[selectedOption.value, searchtype, searchValue]]];
+      }
 
       const response = await fetch(`http://localhost:3000/fetchReferenceRecords`, {
         method: 'POST',
@@ -136,21 +195,22 @@ const HelpDeskList = () => {
         body: JSON.stringify({
           module: 'HelpDesk',
           page,
-          search_params: [[]],
+          //search_params: [[[selectedOption.value, searchtype, searchValue]]],
+          search_params: searchParams,
           crmid: 0,
-          contactid: 3,
+          contactid: user_id,
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched Help Desk Data:', data);
+
         // Dispatch the action to update the Redux state
         dispatch(
           setHelpDeskData({
             data: data.result,
             currentPage: page,
-            totalPages: 5, // Assuming totalPages is fixed in your case
+            totalPages: data.total_pages, // Assuming totalPages is fixed in your case
           })
         );
       }
@@ -161,22 +221,28 @@ const HelpDeskList = () => {
     }
   };
 
+  const handleSearch = () => {
+    const searchField = document.getElementById('search_fieldname');
+    const selectedOption = searchField.options[searchField.selectedIndex];
+    const searchtype = selectedOption.getAttribute('data-searchtype');
+
+    fetchHelpDeskData(searchtype, 1);
+  };
+
   useEffect(() => {
     fetchHelpDeskData();
   }, []); // Fetch data on component mount
 
   const handlePageChange = (newPage) => {
-    fetchHelpDeskData(newPage);
+    const searchField = document.getElementById('search_fieldname');
+    const selectedOption = searchField.options[searchField.selectedIndex];
+    const searchtype = selectedOption.getAttribute('data-searchtype');
+
+    fetchHelpDeskData(searchtype, newPage);
   };
-
-
-  const [selectedTicket, setSelectedTicket] = useState(null);
 
   const handleViewClick = async (ticketid) => {
     try {
-      const search_value = '';
-      const search_fieldname = '';
-      const searchtype = '';
       const response = await fetch(`http://localhost:3000/fetchReferenceRecords`, {
         method: 'POST',
         headers: {
@@ -185,9 +251,9 @@ const HelpDeskList = () => {
         body: JSON.stringify({
           module: 'HelpDesk',
           page: 1,
-          search_params: [[[search_fieldname, searchtype, search_value]]],
+          search_params: [[]],
           crmid: ticketid,
-          contactid: 3,
+          contactid: user_id,
         }),
       });
 
@@ -200,6 +266,60 @@ const HelpDeskList = () => {
     } catch (error) {
       console.error('Error fetching ticket details', error);
     }
+  };
+
+  // Headers for CSV file
+  const headers = [
+    { label: 'Title', key: 'title' },
+    { label: 'Status', key: 'status' },
+    { label: 'Priority', key: 'priority' },
+    // Add more headers as needed
+  ];
+
+
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState({
+    productid: '',
+    productname: '',
+  });
+  const [isProductPopupOpen, setProductPopupOpen] = useState(false);
+
+  const handleProductClick = async () => {
+    // Use the corrected JSON directly
+    //const fetchedProducts = productData.result;
+    try {
+      const fetchProductQuery = "SELECT vtiger_products.* FROM vtiger_products INNER JOIN vtiger_crmentity ON vtiger_products.productid = vtiger_crmentity.crmid  WHERE vtiger_crmentity.deleted=0 AND vtiger_products.productid > 0 ORDER BY vtiger_crmentity.modifiedtime DESC";
+      const productListResponse = await fetch(`http://localhost:3000/fetchCRMRecordByQuery`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "module": "Reports",
+          "query": [fetchProductQuery]
+        }),
+      });
+
+      if (productListResponse.ok) {
+        const fetchedProducts = await productListResponse.json();
+        //setSelectedTicket(data.data[0]);
+        setProducts(fetchedProducts.data);
+        setProductPopupOpen(true);
+      } else {
+        console.error('Error fetching ticket details');
+      }
+    } catch (error) {
+      console.error('Error fetching ticket details', error);
+    }
+  };
+
+  const handleSelectProduct = (product) => {
+    setSelectedProduct(product);
+    // You can also do something with the selected product, like updating your form fields
+  };
+
+  const handleCloseProductPopup = () => {
+    setProductPopupOpen(false);
   };
 
   return (
@@ -229,19 +349,35 @@ const HelpDeskList = () => {
             </div>
             {/* end page title */}
             <div className="row">
+
               <div className="col-xl-8">
                 <div className="card">
                   <div className="card-body">
                     <div className="row mb-2">
                       <div className="col-sm-10">
-                        <form className="form-inline">
+                        <form action='#' className="form-inline">
                           <div className="form-group mb-2 col-sm-12">
-                            <select name="search_fieldname" id="search_fieldname" className="form-control col-sm-4" style={{ marginRight: 7 }}>
-                              <option value="ticket_title" data-searchtype="like">Ticket Name</option>
-                              <option value="ticketstatus" data-searchtype="equel">Status</option>
-                              <option value="ticketpriorities" data-searchtype="equel">Priority</option>
-                              <option value="ticketseverities" data-searchtype="equel">Severity</option>
-                              <option value="ticketcategories" data-searchtype="equel">Category</option>
+                            <select
+                              name="search_fieldname"
+                              id="search_fieldname"
+                              className="form-control col-sm-4"
+                              style={{ marginRight: 7 }}
+                            >
+                              <option value="ticket_title" data-searchtype="like">
+                                Ticket Name
+                              </option>
+                              <option value="ticketstatus" data-searchtype="equel">
+                                Status
+                              </option>
+                              <option value="ticketpriorities" data-searchtype="equel">
+                                Priority
+                              </option>
+                              <option value="ticketseverities" data-searchtype="equel">
+                                Severity
+                              </option>
+                              <option value="ticketcategories" data-searchtype="equel">
+                                Category
+                              </option>
                             </select>
                             <input
                               type="search"
@@ -250,12 +386,17 @@ const HelpDeskList = () => {
                               name="search_value"
                               id="search_value"
                               style={{ marginRight: 5 }}
+                              onKeyUp={handleSearch}
                             />
                             <button
                               type="button"
                               className="btn btn-success waves-effect waves-light"
+                              onClick={handleSearch}
                             >
                               Search
+                            </button>
+                            <button type="button" className="btn btn-success waves-effect waves-light" style={{ marginLeft: 5 }}>
+                              <ExportData data={helpDeskData} headers={headers} filename="Tickets.csv" />
                             </button>
                           </div>
                         </form>
@@ -300,7 +441,7 @@ const HelpDeskList = () => {
                                 </Link>
                                 {/* <Link className="action-icon" to={`/helpdesk-detail/${ticket.ticketid}`}><i className="mdi mdi-eye" /></Link> */}
                                 <a href="#" className="action-icon" onClick={() => handleViewClick(ticket.ticketid)}>
-                                  <i class="fa fa-list-alt" aria-hidden="true"></i>
+                                  <i className="fa fa-list-alt" aria-hidden="true"></i>
                                 </a>
                                 <a href="#" className="action-icon">
                                   <i className="mdi mdi-delete" />
@@ -311,147 +452,10 @@ const HelpDeskList = () => {
                         </tbody>
                       </table>
                     </div>
-                    {/* <ul className="pagination pagination-rounded justify-content-end mb-0 mt-2">
-                      <li className="page-item">
-                        <a
-                          className="page-link"
-                          href="#"
-                          aria-label="Previous"
-                        >
-                          <span aria-hidden="true">«</span>
-                          <span className="sr-only">Previous</span>
-                        </a>
-                      </li>
-                      <li className="page-item active">
-                        <a className="page-link" href="#">
-                          1
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href="#">
-                          2
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href="#">
-                          3
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href="#">
-                          4
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href="#">
-                          5
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a
-                          className="page-link"
-                          href="#"
-                          aria-label="Next"
-                        >
-                          <span aria-hidden="true">»</span>
-                          <span className="sr-only">Next</span>
-                        </a>
-                      </li>
-                    </ul> */}
-
-                    {/* <ul className="pagination pagination-rounded justify-content-end mb-0 mt-2">
-                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                        <button
-                          className="page-link"
-                          onClick={() => handlePageChange(currentPage - 1)}
-                        >
-                          Previous
-                        </button>
-                      </li>
-                      {[...Array(totalPages).keys()].map((page) => (
-                        <li key={page + 1} className={`page-item ${currentPage === page + 1 ? 'active' : ''}`}>
-                          <button
-                            className="page-link"
-                            onClick={() => handlePageChange(page + 1)}
-                          >
-                            {page + 1}
-                          </button>
-                        </li>
-                      ))}
-                      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                        <button
-                          className="page-link"
-                          onClick={() => handlePageChange(currentPage + 1)}
-                        >
-                          Next
-                        </button>
-                      </li>
-                    </ul> */}
-
-                    {/* <ul className="pagination pagination-rounded justify-content-end mb-0 mt-2">
-                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                        <button
-                          className="page-link"
-                          onClick={() => handlePageChange(currentPage - 1)}
-                        >
-                          Previous
-                        </button>
-                      </li>
-                      {getPageNumbers().map((page) => (
-                        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                          <button
-                            className="page-link"
-                            onClick={() => handlePageChange(page)}
-                          >
-                            {page}
-                          </button>
-                        </li>
-                      ))}
-                      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                        <button
-                          className="page-link"
-                          onClick={() => handlePageChange(currentPage + 1)}
-                        >
-                          Next
-                        </button>
-                      </li>
-                    </ul> */}
-
                     <Pagination currentPage={currentPage} totalPages={totalPages} handlePageChange={handlePageChange} />
                   </div>
-                  {/* end card-body*/}
                 </div>
-                {/* end card*/}
               </div>
-              {/* end col */}
-              {/* <div className="col-xl-4">
-                <div className="card-box">
-                  <div className="media mb-3">
-                    <div className="media-body">
-                      <h4 className="mt-0 mb-1">Ticket1</h4>
-                    </div>
-                  </div>
-                  <h5 className="mb-3 mt-4 text-uppercase bg-light p-2">
-                    <i className="mdi mdi-account-circle mr-1" /> Summary View
-                  </h5>
-                  <div className="">
-                    <h4 className="font-13 text-muted text-uppercase mb-1">
-                      Ticket :
-                    </h4>
-                    <p className="mb-3">Ticket1</p>
-
-                    <h4 className="font-13 text-muted text-uppercase mb-1">
-                      Status :
-                    </h4>
-                    <p className="mb-3">Closed</p>
-
-                    <h4 className="font-13 text-muted text-uppercase mb-1">
-                      Priority :
-                    </h4>
-                    <p className="mb-3">High</p>
-                  </div>
-                </div>
-              </div> */}
               <div className="col-xl-4">
                 {selectedTicket ? (
                   <HelpDeskSummary ticket={selectedTicket} />
@@ -466,12 +470,11 @@ const HelpDeskList = () => {
                 )}
               </div>
             </div>
-            {/* end row */}
           </div>
-          {/* container */}
         </div>
-        {/* content */}
       </div>
+
+
       {isModalOpen && (
         <div className="custombox-content custombox-x-center custombox-y-center custombox-fadein custombox-open">
           {/* Background overlay */}
@@ -486,32 +489,88 @@ const HelpDeskList = () => {
               {/* Your modal content goes here */}
               <form>
                 <div className="form-group">
-                  <label htmlFor="name">Name</label>
+                  <label>Ticket Name<span className="text-danger">*</span></label>
                   <input
                     type="text"
-                    className={`form-control ${formErrors.name ? 'is-invalid' : ''}`}
-                    id="name"
-                    name="name"
-                    placeholder="Enter name"
-                    value={formData.name}
+                    className={`form-control ${formErrors.ticket_title ? 'is-invalid' : ''}`}
+                    id="ticket_title"
+                    name="ticket_title"
+                    placeholder="Ticket Name"
+                    value={formData.ticket_title}
                     onChange={handleInputChange}
                   />
-                  {formErrors.name && <div className="invalid-feedback">{formErrors.name}</div>}
+                  {formErrors.ticket_title && <div className="invalid-feedback">{formErrors.ticket_title}</div>}
                 </div>
+
                 <div className="form-group">
-                  <label htmlFor="exampleInputEmail1">Email address</label>
-                  <input
-                    type="email"
-                    className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
-                    id="email"
-                    name="email"
-                    placeholder="Enter email"
-                    value={formData.email}
+                  <label>Status<span className="text-danger">*</span></label>
+                  <select
+                    name="ticketstatus"
+                    className={`form-control ${formErrors.ticketstatus ? 'is-invalid' : ''}`}
+                    id="ticketstatus"
+                    value={formData.ticketstatus}
                     onChange={handleInputChange}
-                  />
-                  {formErrors.email && <div className="invalid-feedback">{formErrors.email}</div>}
+                  >
+                    <option value="">Select an Option</option>
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Wait For Response">Wait For Response</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                  {formErrors.ticketstatus && <div className="invalid-feedback">{formErrors.ticketstatus}</div>}
                 </div>
                 <div className="form-group">
+                  <label>Priority<span className="text-danger">*</span></label>
+                  <select
+                    name="ticketpriorities"
+                    className={`form-control ${formErrors.ticketpriorities ? 'is-invalid' : ''}`}
+                    id="ticketpriorities"
+                    value={formData.ticketpriorities}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">Select an Option</option>
+                    <option value="Low">Low</option>
+                    <option value="Normal">Normal</option>
+                    <option value="High">High</option>
+                    <option value="Urgent">Urgent</option>
+                  </select>
+                  {formErrors.ticketpriorities && <div className="invalid-feedback">{formErrors.ticketpriorities}</div>}
+                </div>
+                <div className="form-group">
+                  <label>Product Name</label>
+                  <div className="referencefield-wrapper">
+                    <input name="popupReferenceModule" type="hidden" defaultValue="Products" />
+                    <div className="input-group">
+                      <input
+                        name="product_id"
+                        type="hidden"
+                        className="sourceField"
+                        value={selectedProduct ? `${selectedProduct.productid}` : ''}
+                      />
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="product_id_display"
+                        name="product_id_display"
+                        placeholder="Select a Product"
+                        value={selectedProduct ? `${selectedProduct.productname}` : ''}
+                      />
+                      <span
+                        className="input-group-addon relatedPopup cursorPointer clickProductPoupList"
+                        title="Select"
+                        onClick={handleProductClick}
+                      >
+                        <i className="fa fa-search" />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+                {/* <div className="form-group">
                   <label htmlFor="position">Phone</label>
                   <input
                     type="text"
@@ -523,8 +582,8 @@ const HelpDeskList = () => {
                     onChange={handleInputChange}
                   />
                   {formErrors.phone && <div className="invalid-feedback">{formErrors.phone}</div>}
-                </div>
-                <div className="form-group">
+                </div> */}
+                {/* <div className="form-group">
                   <label htmlFor="company">Location</label>
                   <input
                     type="text"
@@ -536,7 +595,7 @@ const HelpDeskList = () => {
                     onChange={handleInputChange}
                   />
                   {formErrors.location && <div className="invalid-feedback">{formErrors.location}</div>}
-                </div>
+                </div> */}
                 <div className="text-right">
                   <button
                     type="submit"
@@ -558,6 +617,14 @@ const HelpDeskList = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {isProductPopupOpen && (
+        <ProductPopupList
+          products={products}
+          onSelectProduct={handleSelectProduct}
+          onClose={handleCloseProductPopup}
+        />
       )}
     </>
   );

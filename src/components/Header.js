@@ -75,7 +75,7 @@ const Header = () => {
             <div className="dropdown-header noti-title">
               <h6 className="text-overflow m-0">Welcome !</h6>
             </div>
-            
+
             {/* <Link to="/dashboard/contact-list">Contact List</Link> */}
             <Link to={`/dashboard/user-profile/${user_id}`} className="dropdown-item notify-item"> <i className="fe-user" /><span>My Account</span></Link>
             <div className="dropdown-divider"></div>
@@ -96,6 +96,13 @@ const Header = () => {
         </Link>
 
       </div>
+      <ul className="list-unstyled topnav-menu topnav-menu-left m-0">
+        <li>
+          <button className="button-menu-mobile waves-effect waves-light">
+            <i className="fe-menu" />
+          </button>
+        </li>
+      </ul>
     </div>
     // <header>
     //   <h1>My App</h1>

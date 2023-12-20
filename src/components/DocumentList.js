@@ -116,6 +116,15 @@ const DocumentList = () => {
       const searchField = document.getElementById('search_fieldname');
       const selectedOption = searchField.options[searchField.selectedIndex];
       const searchValue = document.getElementById('search_value').value;
+      let searchParams;
+
+      if (searchValue.trim() === '') {
+        // If searchValue is blank, set searchParams to an empty array
+        searchParams = [[]];
+      } else {
+        // If searchValue is not blank, set searchParams with the specified value
+        searchParams = [[[selectedOption.value, searchtype, searchValue]]];
+      }
 
       const response = await fetch(`http://localhost:3000/fetchReferenceRecords`, {
         method: 'POST',
@@ -125,7 +134,8 @@ const DocumentList = () => {
         body: JSON.stringify({
           module: 'Documents',
           page,
-          search_params: [[[selectedOption.value, searchtype, searchValue]]],
+          //search_params: [[[selectedOption.value, searchtype, searchValue]]],
+          search_params: searchParams,
           crmid: 0,
           contactid: user_id,
         }),
@@ -139,7 +149,7 @@ const DocumentList = () => {
           setDocumentData({
             data: data.result,
             currentPage: page,
-            totalPages: 5, // Assuming totalPages is fixed in your case
+            totalPages: data.total_pages, // Assuming totalPages is fixed in your case
           })
         );
       }

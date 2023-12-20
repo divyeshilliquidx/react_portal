@@ -14,6 +14,7 @@ import './assets/libs/custombox/custombox.min.css';
 import './assets/css/bootstrap.min.css';
 import './assets/css/icons.min.css';
 import './assets/css/app.min.css';
+import ProductPopupList from './ProductPopupList';
 
 const HelpDeskList = () => {
 
@@ -21,10 +22,12 @@ const HelpDeskList = () => {
   const user_name = process.env.REACT_APP_USERNAME;
   const user_password = process.env.REACT_APP_USERPASSWORD;
 
+  const navigate = useNavigate('');
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [formErrors, setFormErrors] = useState({});
   const [selectedTicket, setSelectedTicket] = useState(null);
-  const navigate = useNavigate('');
+
   const [formData, setFormData] = useState({
     ticket_title: '',
     ticketstatus: '',
@@ -47,6 +50,10 @@ const HelpDeskList = () => {
       ticketpriorities: '',
     });
     setFormErrors({});
+    setSelectedProduct({
+      productid: '',
+      productname: '',
+    });
   };
 
   const handleInputChange = (e) => {
@@ -87,6 +94,51 @@ const HelpDeskList = () => {
     return errors;
   };
 
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState({
+    productid: '',
+    productname: '',
+  });
+  const [isProductPopupOpen, setProductPopupOpen] = useState(false);
+
+  const handleProductClick = async () => {
+    // Use the corrected JSON directly
+    //const fetchedProducts = productData.result;
+    try {
+      const fetchProductQuery = "SELECT vtiger_products.* FROM vtiger_products INNER JOIN vtiger_crmentity ON vtiger_products.productid = vtiger_crmentity.crmid  WHERE vtiger_crmentity.deleted=0 AND vtiger_products.productid > 0 ORDER BY vtiger_crmentity.modifiedtime DESC";
+      const productListResponse = await fetch(`http://localhost:3000/fetchCRMRecordByQuery`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "module": "Reports",
+          "query": [fetchProductQuery]
+        }),
+      });
+
+      if (productListResponse.ok) {
+        const fetchedProducts = await productListResponse.json();
+        //setSelectedTicket(data.data[0]);
+        setProducts(fetchedProducts.data);
+        setProductPopupOpen(true);
+      } else {
+        console.error('Error fetching ticket details');
+      }
+    } catch (error) {
+      console.error('Error fetching ticket details', error);
+    }
+  };
+
+  const handleSelectProduct = (product) => {
+    setSelectedProduct(product);
+    // You can also do something with the selected product, like updating your form fields
+  };
+
+  const handleCloseProductPopup = () => {
+    setProductPopupOpen(false);
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     const errors = validateForm();
@@ -99,7 +151,7 @@ const HelpDeskList = () => {
 
         const postData = new FormData();
         postData.append('module', 'HelpDesk');
-        postData.append('values', JSON.stringify({ "ticket_title": formData.ticket_title, "ticketstatus": formData.ticketstatus, "ticketpriorities": formData.ticketpriorities }));
+        postData.append('values', JSON.stringify({ "ticket_title": formData.ticket_title, "ticketstatus": formData.ticketstatus, "ticketpriorities": formData.ticketpriorities, "product_id": '14x' + selectedProduct.productid }));
         postData.append('username', user_name);
         postData.append('password', user_password);
         postData.append('recordId', '');
@@ -171,6 +223,15 @@ const HelpDeskList = () => {
       const selectedOption = searchField.options[searchField.selectedIndex];
       const searchValue = document.getElementById('search_value').value;
 
+      let searchParams;
+      if (searchValue.trim() === '') {
+        // If searchValue is blank, set searchParams to an empty array
+        searchParams = [[]];
+      } else {
+        // If searchValue is not blank, set searchParams with the specified value
+        searchParams = [[[selectedOption.value, searchtype, searchValue]]];
+      }
+
       const response = await fetch(`http://localhost:3000/fetchReferenceRecords`, {
         method: 'POST',
         headers: {
@@ -179,7 +240,8 @@ const HelpDeskList = () => {
         body: JSON.stringify({
           module: 'HelpDesk',
           page,
-          search_params: [[[selectedOption.value, searchtype, searchValue]]],
+          //search_params: [[[selectedOption.value, searchtype, searchValue]]],
+          search_params: searchParams,
           crmid: 0,
           contactid: user_id,
         }),
@@ -193,7 +255,7 @@ const HelpDeskList = () => {
           setHelpDeskData({
             data: data.result,
             currentPage: page,
-            totalPages: 5, // Assuming totalPages is fixed in your case
+            totalPages: data.total_pages, // Assuming totalPages is fixed in your case
           })
         );
       }
@@ -223,9 +285,6 @@ const HelpDeskList = () => {
 
     fetchHelpDeskData(searchtype, newPage);
   };
-
-
-
 
   const handleViewClick = async (ticketid) => {
     try {
@@ -261,6 +320,9 @@ const HelpDeskList = () => {
     { label: 'Priority', key: 'priority' },
     // Add more headers as needed
   ];
+
+
+
 
   return (
     <>
@@ -413,6 +475,8 @@ const HelpDeskList = () => {
           </div>
         </div>
       </div>
+
+
       {isModalOpen && (
         <div className="custombox-content custombox-x-center custombox-y-center custombox-fadein custombox-open">
           {/* Background overlay */}
@@ -433,7 +497,7 @@ const HelpDeskList = () => {
                     className={`form-control ${formErrors.ticket_title ? 'is-invalid' : ''}`}
                     id="ticket_title"
                     name="ticket_title"
-                    placeholder="Enter name"
+                    placeholder="Ticket Name"
                     value={formData.ticket_title}
                     onChange={handleInputChange}
                   />
@@ -475,6 +539,39 @@ const HelpDeskList = () => {
                   </select>
                   {formErrors.ticketpriorities && <div className="invalid-feedback">{formErrors.ticketpriorities}</div>}
                 </div>
+                <div className="form-group">
+                  <label>Product Name</label>
+                  <div className="referencefield-wrapper">
+                    <input name="popupReferenceModule" type="hidden" defaultValue="Products" />
+                    <div className="input-group">
+                      <input
+                        name="product_id"
+                        type="hidden"
+                        className="sourceField"
+                        value={selectedProduct ? `${selectedProduct.productid}` : ''}
+                      />
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="product_id_display"
+                        name="product_id_display"
+                        placeholder="Select a Product"
+                        value={selectedProduct ? `${selectedProduct.productname}` : ''}
+                      />
+                      <span
+                        className="input-group-addon relatedPopup cursorPointer clickProductPoupList"
+                        title="Select"
+                        onClick={handleProductClick}
+                      >
+                        <i className="fa fa-search" />
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+
+
+
                 {/* <div className="form-group">
                   <label htmlFor="position">Phone</label>
                   <input
@@ -522,6 +619,14 @@ const HelpDeskList = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {isProductPopupOpen && (
+        <ProductPopupList
+          products={products}
+          onSelectProduct={handleSelectProduct}
+          onClose={handleCloseProductPopup}
+        />
       )}
     </>
   );
